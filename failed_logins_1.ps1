@@ -17,8 +17,8 @@ $LoginEvents = Get-WinEvent -FilterHashtable @{
 
     LogName = 'Security'; 
     ID = 4624,4625;
-    StartTime = (Get-Date).AddDays(-$Days_to_scan)} -ErrorAction SilentlyContinue -MaxEvents $Events_to_scan
-    | foreach-object {
+    StartTime = (Get-Date).AddDays(-$Days_to_scan)} -ErrorAction SilentlyContinue -MaxEvents $Events_to_scan | 
+    foreach-object {
 
         #gather xml data for each event, then reformat into cleaner object with only relevant fields
         $xmlData = @{}
@@ -37,9 +37,9 @@ $LoginEvents = Get-WinEvent -FilterHashtable @{
             Domain = $xmlData['TargetDomainName']
         }
 
-    }     
-    | Where-object {-not ($_.EventId -eq 4624 -and $_.LogonType -eq 5)} #remove successful service logins
-    | Sort-Object Time -Descending
+    } | 
+    Where-object {-not ($_.EventId -eq 4624 -and $_.LogonType -eq 5)} #remove successful service logins | 
+    Sort-Object Time -Descending
 
 
     $Results = $LoginEvents | Where-Object {
@@ -103,5 +103,6 @@ $LoginEvents = Get-WinEvent -FilterHashtable @{
 
 
     $LoginEvents | Format-Table -AutoSize 
+    $Results | Format-Table -AutoSize
     $Results | Format-Table -AutoSize
     Write-Host $LoginEvents.Count "events scanned."
